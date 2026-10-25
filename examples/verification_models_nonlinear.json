@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "title": "Canonical Verification Models for Non-Linear ARI / EigenFlow (Woodbury Post-Yield Engine)",
+    "description": "Four canonical mechanics-based benchmark models (M1-M4) with elasto-plastic material properties (hardening ratio alpha_h, ultimate ductility mu_ult) used to validate the Woodbury / Sherman-Morrison post-yield solver.",
+    "units": {
+      "force": "kN",
+      "length": "mm",
+      "area": "mm^2",
+      "stress_capacity": "kN",
+      "stiffness": "kN/mm"
+    },
+    "default_material": {
+      "E": 200.0,
+      "alpha_h": 0.02,
+      "mu_ult": 6.0
+    }
+  },
+  "models": [
+    {
+      "id": "M1_parallel_bars_1d",
+      "name": "Two parallel 1D bars (Elasto-Plastic)",
+      "type": "axial_1d",
+      "dimension": 1,
+      "nodes": [
+        {"id": 0, "coords": [0.0]},
+        {"id": 1, "coords": [1000.0]}
+      ],
+      "elements": [
+        {"id": 0, "name": "e0(Bar 1 - Primary)", "nodes": [0, 1], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 1, "name": "e1(Bar 2 - Backup)", "nodes": [0, 1], "area": 50.0, "alpha_h": 0.02, "mu_ult": 6.0}
+      ],
+      "material": {"E": 200.0, "alpha_h": 0.02, "mu_ult": 6.0},
+      "capacities": {"0": 40.0, "1": 20.0},
+      "boundary_conditions": {
+        "node_0": {"ux": 0.0}
+      },
+      "loads": [
+        {"node": 1, "components": {"ux": 30.0}}
+      ],
+      "expected_results": {
+        "umax_mm": 1.000000,
+        "Umax": 0.500000,
+        "yield_load_kN": 60.0,
+        "plastic_collapse_load_kN": 60.0
+      }
+    },
+    {
+      "id": "M2_planar_triangle",
+      "name": "Planar triangular truss (Determinate)",
+      "type": "truss_2d",
+      "dimension": 2,
+      "nodes": [
+        {"id": 0, "coords": [0.0, 0.0]},
+        {"id": 1, "coords": [1000.0, 0.0]},
+        {"id": 2, "coords": [500.0, 800.0]}
+      ],
+      "elements": [
+        {"id": 0, "name": "e0(Left Diag)", "nodes": [0, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 1, "name": "e1(Right Diag)", "nodes": [1, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 2, "name": "e2(Base Tie)", "nodes": [0, 1], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0}
+      ],
+      "material": {"E": 200.0, "alpha_h": 0.02, "mu_ult": 5.0},
+      "capacities": {"0": 40.0, "1": 40.0, "2": 40.0},
+      "boundary_conditions": {
+        "node_0": {"ux": 0.0, "uy": 0.0},
+        "node_1": {"uy": 0.0}
+      },
+      "loads": [
+        {"node": 2, "components": {"ux": 0.0, "uy": -30.0}}
+      ],
+      "expected_results": {
+        "umax_mm": 1.154460,
+        "Umax": 0.442218
+      }
+    },
+    {
+      "id": "M3_square_one_diagonal",
+      "name": "Square with one diagonal (Single Load Path)",
+      "type": "truss_2d",
+      "dimension": 2,
+      "nodes": [
+        {"id": 0, "coords": [0.0, 0.0]},
+        {"id": 1, "coords": [1000.0, 0.0]},
+        {"id": 2, "coords": [1000.0, 1000.0]},
+        {"id": 3, "coords": [0.0, 1000.0]}
+      ],
+      "elements": [
+        {"id": 0, "name": "e0(AB Bottom)", "nodes": [0, 1], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 1, "name": "e1(BC Right)", "nodes": [1, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 2, "name": "e2(CD Top)", "nodes": [2, 3], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 3, "name": "e3(DA Left)", "nodes": [3, 0], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0},
+        {"id": 4, "name": "e4(AC Diagonal)", "nodes": [0, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 5.0}
+      ],
+      "material": {"E": 200.0, "alpha_h": 0.02, "mu_ult": 5.0},
+      "capacities": {"0": 80.0, "1": 80.0, "2": 80.0, "3": 80.0, "4": 80.0},
+      "boundary_conditions": {
+        "node_0": {"ux": 0.0, "uy": 0.0},
+        "node_1": {"uy": 0.0}
+      },
+      "loads": [
+        {"node": 2, "components": {"ux": 30.0, "uy": 0.0}}
+      ],
+      "expected_results": {
+        "umax_mm": 5.935311,
+        "Umax": 0.530330
+      }
+    },
+    {
+      "id": "M4_square_two_diagonals",
+      "name": "Square with two diagonals (Redundant Indeterminate)",
+      "type": "truss_2d",
+      "dimension": 2,
+      "nodes": [
+        {"id": 0, "coords": [0.0, 0.0]},
+        {"id": 1, "coords": [1000.0, 0.0]},
+        {"id": 2, "coords": [1000.0, 1000.0]},
+        {"id": 3, "coords": [0.0, 1000.0]}
+      ],
+      "elements": [
+        {"id": 0, "name": "e0(AB Bottom)", "nodes": [0, 1], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 1, "name": "e1(BC Right)", "nodes": [1, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 2, "name": "e2(CD Top)", "nodes": [2, 3], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 3, "name": "e3(DA Left)", "nodes": [3, 0], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 4, "name": "e4(AC Primary Diag)", "nodes": [0, 2], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0},
+        {"id": 5, "name": "e5(BD Alternate Diag)", "nodes": [1, 3], "area": 100.0, "alpha_h": 0.02, "mu_ult": 6.0}
+      ],
+      "material": {"E": 200.0, "alpha_h": 0.02, "mu_ult": 6.0},
+      "capacities": {"0": 80.0, "1": 80.0, "2": 80.0, "3": 80.0, "4": 80.0, "5": 80.0},
+      "boundary_conditions": {
+        "node_0": {"ux": 0.0, "uy": 0.0},
+        "node_1": {"uy": 0.0}
+      },
+      "loads": [
+        {"node": 2, "components": {"ux": 30.0, "uy": 0.0}}
+      ],
+      "expected_results": {
+        "umax_mm": 3.582277,
+        "Umax": 0.320083
+      }
+    }
+  ]
+}
